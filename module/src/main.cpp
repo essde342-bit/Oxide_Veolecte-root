@@ -155,8 +155,8 @@ static EGLBoolean HookedSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &prevVBO);
     glGetIntegerv(GL_VIEWPORT, prevVP);
     glGetIntegerv(GL_SCISSOR_BOX, prevSc);
-    glGetIntegerv(GL_BLEND_SRC, &prevBlendSrc);
-    glGetIntegerv(GL_BLEND_DST, &prevBlendDst);
+    glGetIntegerv(GL_BLEND_SRC_RGB, &prevBlendSrc);
+    glGetIntegerv(GL_BLEND_DST_RGB, &prevBlendDst);
     prevBlend   = glIsEnabled(GL_BLEND);
     prevDepth   = glIsEnabled(GL_DEPTH_TEST);
     prevCull    = glIsEnabled(GL_CULL_FACE);
