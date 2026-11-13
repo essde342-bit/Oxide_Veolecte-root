@@ -146,17 +146,17 @@ static void EnsureInit() {
 static EGLBoolean HookedSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     EnsureInit();
 
-    GLint prevProgram=0, prevVBO=0, prevVP[4], prevSc[4];
-    GLint prevBlendSrc=GL_ONE, prevBlendDst=GL_ZERO;
-    GLboolean prevBlend=GL_FALSE, prevDepth=GL_FALSE;
-    GLboolean prevCull=GL_FALSE, prevScissor=GL_FALSE;
+    GLint prevProgram = 0, prevVBO = 0, prevVP[4], prevSc[4];
+    GLint prevBlendSrc = GL_ONE, prevBlendDst = GL_ZERO;
+    GLboolean prevBlend = GL_FALSE, prevDepth = GL_FALSE;
+    GLboolean prevCull = GL_FALSE, prevScissor = GL_FALSE;
 
     glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
     glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &prevVBO);
     glGetIntegerv(GL_VIEWPORT, prevVP);
     glGetIntegerv(GL_SCISSOR_BOX, prevSc);
-    glGetIntegerv(GL_BLEND_SRC, &prevBlendSrc);
-    glGetIntegerv(GL_BLEND_DST, &prevBlendDst);
+    glGetIntegerv(GL_BLEND_SRC_RGB, &prevBlendSrc);
+    glGetIntegerv(GL_BLEND_DST_RGB, &prevBlendDst);
     prevBlend   = glIsEnabled(GL_BLEND);
     prevDepth   = glIsEnabled(GL_DEPTH_TEST);
     prevCull    = glIsEnabled(GL_CULL_FACE);
@@ -171,10 +171,10 @@ static EGLBoolean HookedSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     ESPRender();
     MenuRender();
 
-    if(prevDepth)   glEnable(GL_DEPTH_TEST);   else glDisable(GL_DEPTH_TEST);
-    if(prevBlend)   glEnable(GL_BLEND);        else glDisable(GL_BLEND);
-    if(prevCull)    glEnable(GL_CULL_FACE);    else glDisable(GL_CULL_FACE);
-    if(prevScissor) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
+    if (prevDepth)   glEnable(GL_DEPTH_TEST);   else glDisable(GL_DEPTH_TEST);
+    if (prevBlend)   glEnable(GL_BLEND);        else glDisable(GL_BLEND);
+    if (prevCull)    glEnable(GL_CULL_FACE);    else glDisable(GL_CULL_FACE);
+    if (prevScissor) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
     glBlendFunc(prevBlendSrc, prevBlendDst);
     glViewport(prevVP[0], prevVP[1], prevVP[2], prevVP[3]);
     glScissor(prevSc[0], prevSc[1], prevSc[2], prevSc[3]);
