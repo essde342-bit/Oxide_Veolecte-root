@@ -1,0 +1,61 @@
+name: Build Oxide Root Module
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Clone And64InlineHook
+      run: |
+        mkdir -p include
+        git clone --depth 1 https://github.com/Rprop/And64InlineHook.git include/And64InlineHook
+
+    - uses: nttld/setup-ndk@v1
+      id: ndk
+      with:
+        ndk-version: r26b
+
+    - name: Build cheat lib
+      run: |
+        cd module
+        mkdir build && cd build
+        cmake .. \
+          -DCMAKE_TOOLCHAIN_FILE=${{ steps.ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake \
+          -DANDROID_ABI=arm64-v8a \
+          -DANDROID_PLATFORM=android-24 \
+          -DANDROID_STL=c++_static \
+          -DCMAKE_BUILD_TYPE=Release
+        make -j$(nproc)
+
+    - name: Build zygisk
+      run: |
+        cd zygisk
+        ${{ steps.ndk.outputs.ndk-path }}/ndk-build -j$(nproc)
+
+    - name: Package module
+      run: |
+        mkdir -p pkg/zygisk pkg/lib pkg/META-INF/com/google/android
+
+        cp magisk/module.prop pkg/
+        cp magisk/customize.sh pkg/
+        cp magisk/META-INF/com/google/android/update-binary pkg/META-INF/com/google/android/
+        cp magisk/META-INF/com/google/android/updater-script pkg/META-INF/com/google/android/
+
+        cp module/build/liboxide_cheat.so pkg/lib/
+        cp zygisk/libs/arm64-v8a/liboxide_zygisk.so pkg/zygisk/arm64-v8a.so
+
+        chmod 755 pkg/META-INF/com/google/android/update-binary
+        chmod 755 pkg/customize.sh
+
+        cd pkg && zip -r ../oxide-cheat-module.zip . && cd ..
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: oxide-cheat-module
+        path: oxide-cheat-module.zip
